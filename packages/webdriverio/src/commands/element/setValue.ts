@@ -26,8 +26,28 @@
  */
 export async function setValue (
     this: WebdriverIO.Element,
-    value: string | number
+    value: string | number,
+    mask = false
 ) {
     await this.clearValue()
-    return this.addValue(value)
+
+    // TODO add this config somewhere
+    const appiumMaskingEnabled = true
+    if (mask && appiumMaskingEnabled && typeof value === 'string') {
+
+        if (appiumMaskingEnabled) {
+        // First regex: uses the first letter, the last letter, and the length of the string
+            const firstLetter = value[0]
+            const lastLetter = value[value.length - 1]
+            const length = value.length
+            const maskingRegEx = `.*${firstLetter}.{${length - 2}}${lastLetter}.*`
+
+            // Second regex: covers the case where each letter is separated by a comma
+            const maskingWithComaRegEx = `.*${firstLetter}(,.){${length - 2}},${lastLetter}.*`
+
+            this.updateSettings({ newMaskingRules:  [maskingRegEx, maskingWithComaRegEx] })
+        }
+    }
+
+    return this.addValue(value, mask)
 }

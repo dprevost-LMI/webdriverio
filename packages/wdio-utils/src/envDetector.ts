@@ -257,15 +257,6 @@ function isChromium(capabilities?: WebdriverIO.Capabilities) {
 }
 
 /**
- * detects if session has masking patterns
- * @param  {object}  capabilities session capabilities
- * @return {string[]}             RegExp array of masking patterns for text param of commands
- */
-function maskingPatterns(capabilities?: WebdriverIO.Capabilities) {
-    return capabilities?.['wdio:maskingPatterns'] || []
-}
-
-/**
  * returns information about the environment before the session is created
  * @param  {Object}  capabilities           caps provided by user
  * @return {Object}                         object with environment flags
@@ -280,7 +271,6 @@ export function capabilitiesEnvironmentDetector(capabilities: WebdriverIO.Capabi
         isSauce: isSauce(capabilities),
         isBidi: isBidi(capabilities),
         isChromium: isChromium(capabilities),
-        maskingPatterns: maskingPatterns(capabilities)
     }
 }
 
@@ -308,6 +298,5 @@ export function sessionEnvironmentDetector({
         isSeleniumStandalone: isSeleniumStandalone(capabilities),
         isBidi: isBidi(capabilities),
         isChromium: isChromium(capabilities),
-        maskingPatterns: maskingPatterns(capabilities)
     }
 }

@@ -17,7 +17,6 @@ export default function (
     endpointUri: string,
     commandInfo: CommandEndpoint,
     doubleEncodeVariables = false,
-    maskingPatterns: RegExp[] = []
 ) {
     const { command, deprecated, ref, parameters, variables = [], isHubCommand = false } = commandInfo
 
@@ -139,19 +138,22 @@ export default function (
         }
 
         /**
-        * Masking text value when matching regEx
+        * Masking text value when having the parameter mask set to true
         */
         let maskedBody: Record<string, unknown> | undefined
         let maskedArgs: string[] | undefined
-        if (maskingPatterns.length > 0 && commandInfo.parameters.some((param) => param.name === 'text')) {
-
-            const hasSensitiveTextData = Object.entries(body).some(([commandParam, paramValue]) => commandParam === 'text' && maskingPatterns.some((pattern) => pattern.test(paramValue as string)))
-            if (hasSensitiveTextData) {
+        const textValueParamIndex = commandInfo.parameters.findIndex((param) => param.name === 'text')
+        if (textValueParamIndex !== -1) {
+            const requestMasking = Object.entries(body).some(([commandParam, paramValue]) => commandParam === 'mask' && !!paramValue)
+            if (requestMasking) {
                 maskedBody = {
                     ...body,
                     text: sensitiveReplacer
                 }
-                maskedArgs = args.map((arg) => maskingPatterns.some((pattern) => pattern.test(arg as string)) ? sensitiveReplacer : arg) as string[]
+                const textValueArgsIndex = textValueParamIndex + (commandInfo.variables?.length ?? 0)
+                maskedArgs = args.map((arg: string, index) => {
+                    return index === textValueArgsIndex ? sensitiveReplacer : arg
+                })
             }
         }
 
@@ -166,8 +168,11 @@ export default function (
         this.emit('command', { command, method, endpoint, body: maskedBody || body })
         log.info('COMMAND', commandCallStructure(command, maskedArgs || args))
         const request = new environment.value.Request(method, endpoint, body, maskedBody, abortSignal, isHubCommand, {
-            onPerformance: (data) => this.emit('request.performance', data),
-            onRequest: (data) => this.emit('request.start', data),
+            onPerformance: (data) => this.emit('request.performance', maskedBody? { ...data, request: {
+                ...data.request,
+                body: maskedBody
+            } } : data),
+            onRequest: (data) => this.emit('request.start', maskedBody? { ...data, body: maskedBody } : data),
             onResponse: (data) => this.emit('request.end', data),
             onRetry: (data) => this.emit('request.retry', data)
         })

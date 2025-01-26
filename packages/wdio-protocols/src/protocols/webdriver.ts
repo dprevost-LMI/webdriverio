@@ -1007,6 +1007,12 @@ export default {
                     description: 'string to send as keystrokes to the element',
                     required: true,
                 },
+                {
+                    name: 'mask',
+                    type: 'boolean',
+                    description: 'ensure the value is masked outside of the request made to appium server',
+                    required: false,
+                },
             ],
             alternativeCommands: ['element/addValue', 'element/setValue'],
             exampleReferences: ['https://github.com/webdriverio/example-recipes/blob/e8b147e88e7a38351b0918b4f7efbd9ae292201d/api/webdriver/examples.js#L413-L416']
@@ -1720,4 +1726,31 @@ export default {
                 parameters: [],
             },
         },
+    '/session/:sessionId/appium/settings': {
+        GET: {
+            command: 'getSettings',
+            description: 'Retrieve the current settings on the device.',
+            ref: 'https://appium.github.io/appium.io/docs/en/commands/session/settings/get-settings/',
+            parameters: [],
+            returns: {
+                type: 'object',
+                name: 'settings',
+                description:
+                        'JSON hash of all the currently specified settings, see Settings API',
+            },
+        },
+        POST: {
+            command: 'updateSettings',
+            description: 'Update the current setting on the device.',
+            ref: 'https://appium.github.io/appium.io/docs/en/commands/session/settings/update-settings/',
+            parameters: [
+                {
+                    name: 'settings',
+                    type: 'object',
+                    description: 'key/value object with settings to update',
+                    required: true,
+                },
+            ],
+        },
+    },
 }

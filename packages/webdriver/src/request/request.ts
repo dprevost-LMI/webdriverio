@@ -58,7 +58,7 @@ export abstract class WebDriverRequest {
 
     async makeRequest (options: RequestOptions, sessionId?: string) {
         const { url, requestOptions } = await this.createOptions(options, sessionId)
-        this.eventHandler.onRequest?.(requestOptions.maskedBody ? { ...requestOptions, body: requestOptions.maskedBody as unknown as BodyInit } : requestOptions)
+        this.eventHandler.onRequest?.(requestOptions)
         return this._request(url, requestOptions, options.transformResponse, options.connectionRetryCount, 0)
     }
 
@@ -174,8 +174,6 @@ export abstract class WebDriverRequest {
             .catch((err: WebDriverRequestError) => err)
         const durationMillisecond = performance.now() - startTime
 
-        const maskedFullRequestsOptions =  fullRequestOptions.maskedBody ? { ...fullRequestOptions, body: fullRequestOptions.maskedBody as unknown as BodyInit } : fullRequestOptions
-
         /**
          * handle retries for requests
          * @param {Error} error  error object that causes the retry
@@ -189,7 +187,7 @@ export abstract class WebDriverRequest {
             if (retryCount >= totalRetryCount || error.message.includes('invalid session id')) {
                 log.error(error.message)
                 this.eventHandler.onResponse?.({ error })
-                this.eventHandler.onPerformance?.({ request: maskedFullRequestsOptions, durationMillisecond, success: false, error, retryCount })
+                this.eventHandler.onPerformance?.({ request: fullRequestOptions, durationMillisecond, success: false, error, retryCount })
                 throw error
             }
 
@@ -203,7 +201,7 @@ export abstract class WebDriverRequest {
             ++retryCount
 
             this.eventHandler.onRetry?.({ error, retryCount })
-            this.eventHandler.onPerformance?.({ request: maskedFullRequestsOptions, durationMillisecond, success: false, error, retryCount })
+            this.eventHandler.onPerformance?.({ request: fullRequestOptions, durationMillisecond, success: false, error, retryCount })
             log.warn(error.message)
             log.info(`Retrying ${retryCount}/${totalRetryCount}`)
             return this._request(url, fullRequestOptions, transformResponse, totalRetryCount, retryCount)
@@ -233,7 +231,7 @@ export abstract class WebDriverRequest {
             /**
              * throw if request error is unknown
              */
-            this.eventHandler.onPerformance?.({ request: maskedFullRequestsOptions, durationMillisecond, success: false, error: response, retryCount })
+            this.eventHandler.onPerformance?.({ request: fullRequestOptions, durationMillisecond, success: false, error: response, retryCount })
             throw response
         }
 
@@ -246,11 +244,11 @@ export abstract class WebDriverRequest {
          */
         if (isSuccessfulResponse(response.statusCode, response.body)) {
             this.eventHandler.onResponse?.({ result: response.body })
-            this.eventHandler.onPerformance?.({ request: maskedFullRequestsOptions, durationMillisecond, success: true, retryCount })
+            this.eventHandler.onPerformance?.({ request: fullRequestOptions, durationMillisecond, success: true, retryCount })
             return response.body as WebDriverResponse<unknown>
         }
 
-        const error = new WebDriverResponseError(response, url, maskedFullRequestsOptions)
+        const error = new WebDriverResponseError(response, url, fullRequestOptions)
 
         /**
          * hub commands don't follow standard response formats
@@ -262,7 +260,7 @@ export abstract class WebDriverRequest {
              * directly without using a hub, therefore throw
              */
             if (typeof response.body === 'string' && response.body.startsWith('<!DOCTYPE html>')) {
-                this.eventHandler.onPerformance?.({ request: maskedFullRequestsOptions, durationMillisecond, success: false, error, retryCount })
+                this.eventHandler.onPerformance?.({ request: fullRequestOptions, durationMillisecond, success: false, error, retryCount })
                 return Promise.reject(new Error('Command can only be called to a Selenium Hub'))
             }
 
@@ -276,7 +274,7 @@ export abstract class WebDriverRequest {
         if (error.name === 'stale element reference') {
             log.warn('Request encountered a stale element - terminating request')
             this.eventHandler.onResponse?.({ error })
-            this.eventHandler.onPerformance?.({ request: maskedFullRequestsOptions, durationMillisecond, success: false, error, retryCount })
+            this.eventHandler.onPerformance?.({ request: fullRequestOptions, durationMillisecond, success: false, error, retryCount })
             throw error
         }
 
