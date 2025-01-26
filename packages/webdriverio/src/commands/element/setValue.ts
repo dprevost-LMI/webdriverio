@@ -1,3 +1,5 @@
+import { getBrowserObject, isAppiumCapability } from '@wdio/utils'
+
 /**
  * Send a sequence of key strokes to an element after the input has been cleared before. If the element doesn't need
  * to be cleared first then use [`addValue`](/docs/api/element/addValue).
@@ -31,20 +33,17 @@ export async function setValue (
 ) {
     await this.clearValue()
 
-    // TODO add this config somewhere
-    const appiumMaskingEnabled = true
-    if (mask && appiumMaskingEnabled && typeof value === 'string') {
-
-        if (appiumMaskingEnabled) {
-        // First regex: uses the first letter, the last letter, and the length of the string
+    if (mask && typeof value === 'string') {
+        const isAppiumEnabled = isAppiumCapability(getBrowserObject(this).capabilities)
+        if (isAppiumEnabled) {
+            // First regex to mask the value for app entry like `Calling AppiumDriver-setValue() with args: ["myPassword","00000000-0000-0d8c-0000-00eb000000ca","62397a2-27d4-43dc-be63-bfb4c94550"]`
             const firstLetter = value[0]
             const lastLetter = value[value.length - 1]
             const length = value.length
             const maskingRegEx = `.*${firstLetter}.{${length - 2}}${lastLetter}.*`
 
-            // Second regex: covers the case where each letter is separated by a comma
+            // Second regex is to cover case like `Added 'value' property ["m", "y", "P", "a", "s", "s", "w", "o", "r","d"] to 'setValue' request body`
             const maskingWithComaRegEx = `.*${firstLetter}(,.){${length - 2}},${lastLetter}.*`
-
             this.updateSettings({ newMaskingRules:  [maskingRegEx, maskingWithComaRegEx] })
         }
     }
