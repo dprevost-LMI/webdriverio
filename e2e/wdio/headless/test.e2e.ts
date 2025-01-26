@@ -14,6 +14,18 @@ describe('main suite 1', () => {
         await browser.url('https://guinea-pig.webdriver.io/')
         await expect($('.findme')).toMatchSnapshot()
         await expect($('.findme')).toMatchInlineSnapshot('"<h1 class="findme">Test CSS Attributes</h1>"')
+
+        const firstInput = await $('input')
+        await firstInput.setValue('Hello World', true)
+        await driver.pause(10000)
+    })
+
+    // TODO dprevost revert the .only
+    it.only('should support masking of input value', async () => {
+        await browser.url('https://guinea-pig.webdriver.io/')
+
+        const firstInput = await $('input')
+        await firstInput.setValue('Hello World', true)
     })
 
     it('should allow to check for PWA', async () => {
