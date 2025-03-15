@@ -1,5 +1,5 @@
 import logger from '@wdio/logger'
-import { commandCallStructure, isValidParameter, getArgumentType } from '@wdio/utils'
+import { commandCallStructure, isValidParameter, getArgumentType, transformCommandLogResult } from '@wdio/utils'
 import { WebDriverBidiProtocol, type CommandEndpoint } from '@wdio/protocols'
 
 import { environment } from './environment.js'
@@ -16,7 +16,7 @@ export default function (
     method: string,
     endpointUri: string,
     commandInfo: CommandEndpoint,
-    doubleEncodeVariables = false,
+    doubleEncodeVariables = false
 ) {
     const { command, deprecated, ref, parameters, variables = [], isHubCommand = false } = commandInfo
 
@@ -157,24 +157,15 @@ export default function (
             }
         }
 
-        const request = new environment.value.Request(
-            method,
-            endpoint,
-            body,
-            maskedBody,
-            isHubCommand
-        )
-        request.on('performance', (...args) => this.emit('request.performance', ...args))
-        this.emit('command', { command, method, endpoint, body: maskedBody || body })
-        log.info('COMMAND', commandCallStructure(command, maskedArgs || args))
-        const request = new environment.value.Request(method, endpoint, body, maskedBody, abortSignal, isHubCommand, {
+        const request = new environment.value.Request(method, endpoint, body, abortSignal, isHubCommand, {
             onPerformance: (data) => this.emit('request.performance', maskedBody? { ...data, request: {
                 ...data.request,
                 body: maskedBody
             } } : data),
             onRequest: (data) => this.emit('request.start', maskedBody? { ...data, body: maskedBody } : data),
             onResponse: (data) => this.emit('request.end', data),
-            onRetry: (data) => this.emit('request.retry', data)
+            onRetry: (data) => this.emit('request.retry', data),
+            onLogData: (data) => log.info('DATA', transformCommandLogResult((maskedBody || data) as Record<string, unknown>))
         })
         this.emit('command', { command, method, endpoint, body: maskedBody || body })
         log.info('COMMAND', commandCallStructure(command, maskedArgs || args))

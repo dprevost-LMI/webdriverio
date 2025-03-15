@@ -1,5 +1,5 @@
 import logger from '@wdio/logger'
-import { transformCommandLogResult, sleep } from '@wdio/utils'
+import { sleep } from '@wdio/utils'
 import type { Options } from '@wdio/types'
 
 import  { WebDriverResponseError, WebDriverRequestError } from './error.js'
@@ -30,7 +30,6 @@ export abstract class WebDriverRequest {
     protected abstract fetch(url: URL, opts: RequestInit): Promise<Response>
 
     body?: Record<string, unknown>
-    maskedBody?: Record<string, unknown>
     method: string
     endpoint: string
     isHubCommand: boolean
@@ -41,13 +40,11 @@ export abstract class WebDriverRequest {
         method: string,
         endpoint: string,
         body?: Record<string, unknown>,
-        maskedBody?: Record<string, unknown>,
         abortSignal?: AbortSignal,
         isHubCommand: boolean = false,
         eventHandler: RequestEventHandler = {}
     ) {
         this.body = body
-        this.maskedBody = maskedBody
         this.method = method
         this.endpoint = endpoint
         this.isHubCommand = isHubCommand
@@ -62,9 +59,9 @@ export abstract class WebDriverRequest {
         return this._request(url, requestOptions, options.transformResponse, options.connectionRetryCount, 0)
     }
 
-    async createOptions (options: RequestOptions, sessionId?: string, isBrowser: boolean = false): Promise<{url: URL; requestOptions: RequestInit & {maskedBody?: Record<string, unknown>};}> {
+    async createOptions (options: RequestOptions, sessionId?: string, isBrowser: boolean = false): Promise<{url: URL; requestOptions: RequestInit}> {
         const timeout = options.connectionRetryTimeout || DEFAULTS.connectionRetryTimeout.default as number
-        const requestOptions: RequestInit & {maskedBody?: Record<string, unknown>} = {
+        const requestOptions: RequestInit = {
             method: this.method,
             redirect: 'follow',
             signal: AbortSignal.any([
@@ -86,7 +83,6 @@ export abstract class WebDriverRequest {
         if (this.body && (Object.keys(this.body).length || this.method === 'POST')) {
             const contentLength = Buffer.byteLength(JSON.stringify(this.body), 'utf8')
             requestOptions.body = this.body as unknown as BodyInit
-            requestOptions.maskedBody = this.maskedBody
             requestHeaders.set('Content-Length', `${contentLength}`)
         }
 
@@ -158,7 +154,7 @@ export abstract class WebDriverRequest {
 
     protected async _request (
         url: URL,
-        fullRequestOptions: RequestInit & {maskedBody?: Record<string, unknown>},
+        fullRequestOptions: RequestInit,
         transformResponse?: (response: RequestLibResponse, requestOptions: RequestInit) => RequestLibResponse,
         totalRetryCount = 0,
         retryCount = 0
@@ -166,7 +162,7 @@ export abstract class WebDriverRequest {
         log.info(`[${fullRequestOptions.method}] ${(url as URL).href}`)
 
         if (fullRequestOptions.body && Object.keys(fullRequestOptions.body).length) {
-            log.info('DATA', transformCommandLogResult((fullRequestOptions.maskedBody || fullRequestOptions.body) as Record<string, unknown>))
+            this.eventHandler.onLogData?.(fullRequestOptions.body)
         }
 
         const startTime = performance.now()
