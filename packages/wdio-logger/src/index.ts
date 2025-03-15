@@ -75,12 +75,20 @@ const parseMaskingPatterns = (maskingRegexString: string | undefined) => {
     const regEx = regexStrings?.map((regexStr) => {
         const regexParts = regexStr.match(/^\/(.*?)\/([gimsuy]*)$/)
         if (!regexParts) {
+            try {
             // When passing only a simple string without `/` or flags aka `(--key=)([^ ]*)`
-            return new RegExp(regexStr)
+                return new RegExp(regexStr)
+            } catch {
+                return undefined
+            }
         }
         if (regexParts?.[1]) {
-            // Case when passing `/(--key=)([^ ]*)/i` or `/(--key=)([^ ]*)/`
-            return regexParts[2] ? new RegExp(regexParts[1], regexParts[2]) : new RegExp(regexParts[1])
+            try {
+                // Case when passing `/(--key=)([^ ]*)/i` or `/(--key=)([^ ]*)/`
+                return regexParts[2] ? new RegExp(regexParts[1], regexParts[2]) : new RegExp(regexParts[1], 'g')
+            } catch {
+                return undefined
+            }
         }
         return undefined
 
@@ -88,11 +96,17 @@ const parseMaskingPatterns = (maskingRegexString: string | undefined) => {
     return regEx
 }
 
-const maskText = (text: string, maskingRegexPatterns: RegExp[] | undefined) => {
-    if (!maskingRegexPatterns) {return text}
+const maskText = (text: string, maskingPatterns: RegExp[] | undefined) => {
+    if (!maskingPatterns) {return text}
     let maskedText = text
-    maskingRegexPatterns.forEach((maskingRegex) => {
-        maskedText = maskedText.replace(maskingRegex, '$1**MASKED**')
+    maskingPatterns.forEach((maskingRegex) => {
+        // Using the below allow supporting the 'g' flags easier else using 'g' with text.match(regExp) does not output proper capturing groups
+        const groupCount = (maskingRegex.source.match(/\((?!\?)/g) || []).length
+        console.log('ENV', process.env.WDIO_LOG_MASKING_PATTERNS)
+        console.log('maskingRegex', maskingRegex)
+        console.log('maskedText', maskedText)
+        console.log('groupCount', groupCount)
+        maskedText = maskedText.replace(maskingRegex, groupCount < 2 ? '**MASKED**': '$1**MASKED**')
     })
     return maskedText
 }
