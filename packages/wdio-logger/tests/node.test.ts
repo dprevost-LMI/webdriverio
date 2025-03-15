@@ -291,11 +291,11 @@ describe('wdio-logger node', () => {
             expect(write.mock.results[0].value).toContain('TOKEN=**MASKED** wdio.conf.ts --user=myUser --key=**MASKED** --spec template.test.ts')
         })
 
-        it.only('skipped regex when it is invalid', () => {
+        it('skipped regex when it is invalid', () => {
             process.env.WDIO_LOG_PATH = 'wdio.test.log'
             process.env.WDIO_LOG_MASKING_PATTERNS = '(--key=)([^ ]*'
 
-            const log = nodeLogger('test-masked2RegExHaving2Group')
+            const log = nodeLogger('test-invalidRegEx')
             log.info('TOKEN=mySecretToken wdio.conf.ts --user=myUser --key=mySecretKey --spec template.test.ts')
 
             expect(write.mock.results[0].value).toContain('TOKEN=mySecretToken wdio.conf.ts --user=myUser --key=mySecretKey --spec template.test.ts')

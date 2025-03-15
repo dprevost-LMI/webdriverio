@@ -10,7 +10,7 @@ import type { BaseClient, BidiCommands, BidiResponses, WebDriverResultEvent } fr
 const log = logger('webdriver')
 const BIDI_COMMANDS: BidiCommands[] = Object.values(WebDriverBidiProtocol).map((def) => def.socket.command)
 const sessionAbortListeners = new Map<string, Set<AbortController> | null>()
-const sensitiveReplacer = '*SECURE*'
+const sensitiveReplacer = '*MASKED*'
 
 export default function (
     method: string,
@@ -101,9 +101,9 @@ export default function (
                     : getArgumentType(arg)
                 throw new Error(
                     `Malformed type for "${commandParam.name}" parameter of command ${command}\n` +
-                        `Expected: ${commandParam.type}\n` +
-                        `Actual: ${actual}` +
-                        moreInfo
+                    `Expected: ${commandParam.type}\n` +
+                    `Actual: ${actual}` +
+                    moreInfo
                 )
             }
 
@@ -158,11 +158,11 @@ export default function (
         }
 
         const request = new environment.value.Request(method, endpoint, body, abortSignal, isHubCommand, {
-            onPerformance: (data) => this.emit('request.performance', maskedBody? { ...data, request: {
+            onPerformance: (data) => this.emit('request.performance', { ...data, request: {
                 ...data.request,
-                body: maskedBody
-            } } : data),
-            onRequest: (data) => this.emit('request.start', maskedBody? { ...data, body: maskedBody } : data),
+                body: maskedBody || data.request.body
+            } }),
+            onRequest: (data) => this.emit('request.start', { ...data, body: maskedBody || data.body }),
             onResponse: (data) => this.emit('request.end', data),
             onRetry: (data) => this.emit('request.retry', data),
             onLogData: (data) => log.info('DATA', transformCommandLogResult((maskedBody || data) as Record<string, unknown>))

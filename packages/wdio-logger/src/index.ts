@@ -85,7 +85,7 @@ const parseMaskingPatterns = (maskingRegexString: string | undefined) => {
         if (regexParts?.[1]) {
             try {
                 // Case when passing `/(--key=)([^ ]*)/i` or `/(--key=)([^ ]*)/`
-                return regexParts[2] ? new RegExp(regexParts[1], regexParts[2]) : new RegExp(regexParts[1], 'g')
+                return regexParts[2] ? new RegExp(regexParts[1], regexParts[2]) : new RegExp(regexParts[1])
             } catch {
                 return undefined
             }
@@ -102,10 +102,6 @@ const maskText = (text: string, maskingPatterns: RegExp[] | undefined) => {
     maskingPatterns.forEach((maskingRegex) => {
         // Using the below allow supporting the 'g' flags easier else using 'g' with text.match(regExp) does not output proper capturing groups
         const groupCount = (maskingRegex.source.match(/\((?!\?)/g) || []).length
-        console.log('ENV', process.env.WDIO_LOG_MASKING_PATTERNS)
-        console.log('maskingRegex', maskingRegex)
-        console.log('maskedText', maskedText)
-        console.log('groupCount', groupCount)
         maskedText = maskedText.replace(maskingRegex, groupCount < 2 ? '**MASKED**': '$1**MASKED**')
     })
     return maskedText

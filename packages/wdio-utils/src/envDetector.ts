@@ -270,7 +270,7 @@ export function capabilitiesEnvironmentDetector(capabilities: WebdriverIO.Capabi
         isAndroid: isAndroid(capabilities),
         isSauce: isSauce(capabilities),
         isBidi: isBidi(capabilities),
-        isChromium: isChromium(capabilities),
+        isChromium: isChromium(capabilities)
     }
 }
 
@@ -297,6 +297,6 @@ export function sessionEnvironmentDetector({
         isSauce: isSauce(requestedCapabilities),
         isSeleniumStandalone: isSeleniumStandalone(capabilities),
         isBidi: isBidi(capabilities),
-        isChromium: isChromium(capabilities),
+        isChromium: isChromium(capabilities)
     }
 }

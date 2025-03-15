@@ -165,8 +165,9 @@ export abstract class WebDriverRequest {
             this.eventHandler.onLogData?.(fullRequestOptions.body)
         }
 
+        const { ...requestLibOptions } = fullRequestOptions
         const startTime = performance.now()
-        let response = await this._libRequest(url!, { ...fullRequestOptions })
+        let response = await this._libRequest(url!, requestLibOptions)
             .catch((err: WebDriverRequestError) => err)
         const durationMillisecond = performance.now() - startTime
 

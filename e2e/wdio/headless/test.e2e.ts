@@ -20,8 +20,7 @@ describe('main suite 1', () => {
         await driver.pause(10000)
     })
 
-    // TODO dprevost revert the .only
-    it.only('should support masking of input value', async () => {
+    it('should support masking of input value', async () => {
         await browser.url('https://guinea-pig.webdriver.io/')
 
         const firstInput = await $('input')

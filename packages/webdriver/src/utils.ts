@@ -453,24 +453,3 @@ export function parseBidiMessage (this: EventEmitter, data: Buffer) {
         log.error(`Failed parse WebDriver Bidi message: ${(err as Error).message}`)
     }
 }
-
-export function toRegularExpressions (regExp : string[] | undefined) {
-    return regExp?.map(toRegularExpression)
-}
-
-export function toRegularExpression (regExp : string): RegExp {
-    const lastSlashIndex = regExp.lastIndexOf('/')
-
-    if (!regExp.startsWith('/') || lastSlashIndex === 0) {
-        // When not surrounded by slashes we do our best to convert it to a RegExp
-        return new RegExp(regExp)
-    }
-
-    const pattern = regExp.slice(1, lastSlashIndex)
-    const flags = regExp.slice(lastSlashIndex + 1)
-
-    // When no flags are provided
-    if (!flags) {return new RegExp(pattern)}
-
-    return new RegExp(pattern, flags)
-}
