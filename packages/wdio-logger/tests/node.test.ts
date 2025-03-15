@@ -221,6 +221,26 @@ describe('wdio-logger node', () => {
             expect(write.mock.results[3].value).toContain('test-logFile4: Error: bar')
         })
 
+        it('masked sensitive information with one reg ex', () => {
+            process.env.WDIO_LOG_PATH = 'wdio.test.log'
+            process.env.WDIO_LOG_MASKING_PATTERNS = '/(--key=)([^ ]*)/g'
+
+            const log = nodeLogger('test-maskedLogFile')
+            log.info('wdio.conf.ts --user= --key=mySecretKey --spec template.test.ts')
+
+            expect(write.mock.results[0].value).toContain('wdio.conf.ts --user= --key=**MASKED** --spec template.test.ts')
+        })
+
+        it('masked sensitive information with two reg ex', () => {
+            process.env.WDIO_LOG_PATH = 'wdio.test.log'
+            process.env.WDIO_LOG_MASKING_PATTERNS = '(--key=)([^ ]*),/(TOKEN=)([^ ]*)/i'
+
+            const log = nodeLogger('test-masked2RegExLogFile')
+            log.info('TOKEN=mySecretToken wdio.conf.ts --user=myUser --key=mySecretKey --spec template.test.ts')
+
+            expect(write.mock.results[0].value).toContain('TOKEN=**MASKED** wdio.conf.ts --user=myUser --key=**MASKED** --spec template.test.ts')
+        })
+
         it('is not confused by multiple copies of source code', () => {
             process.env.WDIO_LOG_PATH = 'wdio.test.log'
 

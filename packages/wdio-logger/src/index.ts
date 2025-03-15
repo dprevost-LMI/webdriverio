@@ -56,6 +56,7 @@ const SERIALIZERS = [{
 }]
 
 interface LoggerInterface extends log.Logger {
+    maskingPatterns: RegExp[] | undefined
     progress(...msg: string[]): void;
 }
 
@@ -68,8 +69,36 @@ let logLevelsConfig: Record<string, log.LogLevelDesc> = {}
 const logCache = new Set()
 let logFile: fs.WriteStream | null
 
+const parseMaskingPatterns = (maskingRegexString: string | undefined) => {
+    const regexStrings = maskingRegexString?.split(',')
+
+    const regEx = regexStrings?.map((regexStr) => {
+        const regexParts = regexStr.match(/^\/(.*?)\/([gimsuy]*)$/)
+        if (!regexParts) {
+            // When passing only a simple string without `/` or flags aka `(--key=)([^ ]*)`
+            return new RegExp(regexStr)
+        }
+        if (regexParts?.[1]) {
+            // Case when passing `/(--key=)([^ ]*)/i` or `/(--key=)([^ ]*)/`
+            return regexParts[2] ? new RegExp(regexParts[1], regexParts[2]) : new RegExp(regexParts[1])
+        }
+        return undefined
+
+    }).filter((regex) => regex !== undefined)
+    return regEx
+}
+
+const maskText = (text: string, maskingRegexPatterns: RegExp[] | undefined) => {
+    if (!maskingRegexPatterns) {return text}
+    let maskedText = text
+    maskingRegexPatterns.forEach((maskingRegex) => {
+        maskedText = maskedText.replace(maskingRegex, '$1**MASKED**')
+    })
+    return maskedText
+}
+
 const originalFactory = log.methodFactory
-const wdioLoggerMethodFactory = function (this: log.Logger, methodName: log.LogLevelNames, logLevel: log.LogLevelNumbers, loggerName: string) {
+const wdioLoggerMethodFactory = (maskingPatterns: RegExp[] | undefined) => function (this: log.Logger, methodName: log.LogLevelNames, logLevel: log.LogLevelNumbers, loggerName: string) {
     const rawMethod = originalFactory(methodName, logLevel, loggerName)
     return (...args: string[]) => {
         /**
@@ -80,7 +109,7 @@ const wdioLoggerMethodFactory = function (this: log.Logger, methodName: log.LogL
         }
 
         /**
-         * split `prefixer: value` sting to `prefixer: ` and `value`
+         * split `prefixer: value` string to `prefixer: ` and `value`
          * so that SERIALIZERS can match certain string
          */
         const match = Object.values(matches).filter(x => args[0].endsWith(`: ${x}`))[0]
@@ -98,7 +127,7 @@ const wdioLoggerMethodFactory = function (this: log.Logger, methodName: log.LogL
             return arg
         })
 
-        const logText = ansiStrip(`${util.format.apply(this, args as [format: string, ...params: string[]])}\n`)
+        const logText = maskText(ansiStrip(`${util.format.apply(this, args as [format: string, ...params: string[]])}\n`), maskingPatterns)
         if (logFile && logFile.writable) {
             /**
              * empty logging cache if stuff got logged before
@@ -152,7 +181,10 @@ export default function getLogger (name: string) {
 
     loggers[name] = log.getLogger(name) as LoggerInterface
     loggers[name].setLevel(logLevel)
-    loggers[name].methodFactory = wdioLoggerMethodFactory
+
+    const maskingPatterns = parseMaskingPatterns(process.env.WDIO_LOG_MASKING_PATTERNS)
+    loggers[name].methodFactory = wdioLoggerMethodFactory(maskingPatterns)
+
     loggers[name].progress = progress
     prefix.apply(loggers[name], {
         template: '%t %l %n:',
