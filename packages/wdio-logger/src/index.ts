@@ -134,7 +134,10 @@ const wdioLoggerMethodFactory = (maskingPatterns: RegExp[] | undefined) => funct
                     return s.serialize(arg as Error & string) as string
                 }
             }
-            return maskText(arg, maskingPatterns)
+            if (typeof arg === 'string') {
+                return maskText(arg, maskingPatterns)
+            }
+            return arg
         })
 
         const logText = ansiStrip(`${util.format.apply(this, args as [format: string, ...params: string[]])}\n`)
