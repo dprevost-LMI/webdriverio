@@ -134,10 +134,10 @@ const wdioLoggerMethodFactory = (maskingPatterns: RegExp[] | undefined) => funct
                     return s.serialize(arg as Error & string) as string
                 }
             }
-            return arg
+            return maskText(arg, maskingPatterns)
         })
 
-        const logText = maskText(ansiStrip(`${util.format.apply(this, args as [format: string, ...params: string[]])}\n`), maskingPatterns)
+        const logText = ansiStrip(`${util.format.apply(this, args as [format: string, ...params: string[]])}\n`)
         if (logFile && logFile.writable) {
             /**
              * empty logging cache if stuff got logged before
