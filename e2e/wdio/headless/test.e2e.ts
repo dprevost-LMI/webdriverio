@@ -263,7 +263,7 @@ describe('main suite 1', () => {
                 const rectAfter = await waitForMousePosition(countBeforeSecondMove)
                 expect(rectBefore.x + (input && input?.xOffset ? input?.xOffset : 0)).toEqual(rectAfter.x)
                 expect(rectBefore.y + (input && input?.yOffset ? input?.yOffset : 0)).toEqual(rectAfter.y)
-            }, )
+            })
         })
 
         /**
