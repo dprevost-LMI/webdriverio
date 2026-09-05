@@ -251,7 +251,10 @@ describe('main suite 1', () => {
         })
 
         inputs.forEach((input) => {
-            it(`moves to position x,y outside of iframe when passing the arguments ${JSON.stringify(input)}`, async () => {
+            it(`moves to position x,y outside of iframe when passing the arguments ${JSON.stringify(input)}`, async function() {
+                // Unstable test, retry up to 3 times `Expected: 90 Received: 504` with when input = `{"xOffset":10}`
+                this.retries(3)
+
                 await setupMouseTracking()
                 await browser.$('#parent').moveTo()
                 const rectBefore = await waitForMousePosition(0)
@@ -260,7 +263,7 @@ describe('main suite 1', () => {
                 const rectAfter = await waitForMousePosition(countBeforeSecondMove)
                 expect(rectBefore.x + (input && input?.xOffset ? input?.xOffset : 0)).toEqual(rectAfter.x)
                 expect(rectBefore.y + (input && input?.yOffset ? input?.yOffset : 0)).toEqual(rectAfter.y)
-            })
+            }, )
         })
 
         /**
