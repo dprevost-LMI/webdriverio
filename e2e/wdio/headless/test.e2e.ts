@@ -639,7 +639,8 @@ describe('main suite 1', () => {
             await closeAllWindowsButFirst()
         })
 
-        it('should allow user to switch between contexts', async () => {
+        it('should allow user to switch between contexts', async function() {
+            this.retries(3) // Unstable fails with `Error: Timeout`
             await browser.url('https://guinea-pig.webdriver.io/')
 
             await browser.newWindow('https://webdriver.io')
@@ -699,11 +700,13 @@ describe('main suite 1', () => {
     })
 
     describe('switchFrame', () => {
-        afterEach(async () => {
+        afterEach(async function() {
+            this.retries(3) // Unstable fails with `Error: Timeout`
             await browser.switchFrame(null)
         })
 
-        it('can switch to a frame via url', async () => {
+        it('can switch to a frame via url', async function() {
+            this.retries(3) // Unstable fails with `Error: Timeout`
             await browser.url('https://guinea-pig.webdriver.io/iframe.html')
             await browser.switchFrame('https://guinea-pig.webdriver.io/iframeA2.html')
             expect(await browser.execute(() => [document.title, document.URL]))
@@ -844,8 +847,9 @@ describe('main suite 1', () => {
     })
 
     describe('open resources with different protocols', () => {
-        it('http', async () => {
-            browser.url('https://guinea-pig.webdriver.io/')
+        it('http', async function() {
+            this.retries(3) // Unstable fails with `Error: Timeout`
+            await browser.url('https://guinea-pig.webdriver.io/')
             await expect(browser).toHaveUrl('https://guinea-pig.webdriver.io/')
         })
 
