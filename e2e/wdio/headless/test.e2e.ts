@@ -700,8 +700,7 @@ describe('main suite 1', () => {
     })
 
     describe('switchFrame', () => {
-        afterEach(async function() {
-            this.retries(3) // Unstable fails with `Error: Timeout`
+        afterEach(async () => {
             await browser.switchFrame(null)
         })
 
