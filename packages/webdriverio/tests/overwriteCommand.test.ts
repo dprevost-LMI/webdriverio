@@ -57,14 +57,6 @@ describe('overwriteCommand', () => {
                 expect(await browser.pause(10, 10)).toBeGreaterThanOrEqual(20)
             })
 
-            test('should be able to handle async', async () => {
-                const browser = await remote(remoteConfig)
-                browser.overwriteCommand('pause', customBrowserCommand)
-
-                // @ts-expect-error command overwritten
-                expect(await browser.pause(10, 10)).toBeGreaterThanOrEqual(20)
-            })
-
             test('should still work on browser calls after fetching an element', async () => {
                 const browser = await remote(remoteConfig)
                 await browser.$('#foo')
