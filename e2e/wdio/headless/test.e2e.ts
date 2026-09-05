@@ -917,7 +917,8 @@ describe('main suite 1', () => {
             hash: ['#reloadCounter', '0']
         }
         for (const [name, [value, expected]] of Object.entries(scenarios)) {
-            it(`reloads with ${name}`, async () => {
+            it(`reloads with ${name}`, async function() {
+                this.retries(3) // Unstable test `Expected: "0" Received: "1"` on `reloads with nothing`
                 const url = `https://guinea-pig.webdriver.io/reloadCounter.html${value}`
                 await browser.url(url)
                 await $('#reset').click()
