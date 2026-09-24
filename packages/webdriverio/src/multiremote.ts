@@ -20,7 +20,7 @@ type WrappedClient = {
 }
 
 /**
- * Multiremote class
+ * MultiRemote class
  */
 export default class MultiRemote {
     instances: Record<string, WebdriverIO.Browser> = {}
@@ -162,7 +162,7 @@ export default class MultiRemote {
             }
 
             client.instances = Object.keys(instances)
-            client.isMultiremote = true
+            client.isMultiRemote = true
             client.selector = selector ?? (Array.isArray(result) && result[0]
                 ? result[0].selector
                 : null)
@@ -210,7 +210,7 @@ export default class MultiRemote {
         if (commandName === 'getInstance') {
             return function commandWrapperGetInstance(this: Record<string, WebdriverIO.Browser | WebdriverIO.Element>, browserName: string) {
                 if (!this[browserName]) {
-                    throw new Error(`Multiremote object has no instance named "${browserName}"`)
+                    throw new Error(`MultiRemote object has no instance named "${browserName}"`)
                 }
                 return this[browserName]
             }
@@ -256,7 +256,7 @@ export default class MultiRemote {
                     commandName
                 )
 
-                elementArray.isMultiremote = true
+                elementArray.isMultiRemote = true
                 return elementArray
             }
             return result
@@ -270,7 +270,7 @@ export default class MultiRemote {
 /* istanbul ignore next */
 export class MultiRemoteDriver {
     instances: string[]
-    isMultiremote = true as const
+    isMultiRemote = true as const
     __propertiesObject__: Record<string, PropertyDescriptor>
 
     constructor (

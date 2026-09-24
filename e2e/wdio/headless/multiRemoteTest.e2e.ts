@@ -221,7 +221,7 @@ describe('multi remote test', () => {
                     expect(selected.instances).toEqual(['browserA', 'browserB'])
                     expect(selected.getInstance('browserA')).toBeDefined()
                     expect(selected.getInstance('browserB')).toBeDefined()
-                    expect(() => selected.getInstance('browserC')).toThrow('Multiremote object has no instance named "browserC"')
+                    expect(() => selected.getInstance('browserC')).toThrow('MultiRemote object has no instance named "browserC"')
                 })
 
                 it('should be able to chain select', async () => {
@@ -229,7 +229,7 @@ describe('multi remote test', () => {
 
                     expect(selected.instances).toEqual(['browserA'])
                     expect(selected.getInstance('browserA')).toBeDefined()
-                    expect(() => selected.getInstance('browserB')).toThrow('Multiremote object has no instance named "browserB"')
+                    expect(() => selected.getInstance('browserB')).toThrow('MultiRemote object has no instance named "browserB"')
                 })
 
                 it('should be able to select 2 instances on the element', async () => {
@@ -334,7 +334,7 @@ describe('multi remote test', () => {
                     expect(browserA.puppeteer).toBeDefined()
                     expect(browserA.isNativeContext).toBe(false)
                     expect(browserA.mobileContext).toBe(undefined)
-                    expect(browserA.isMultiremote).toBe(undefined)
+                    expect(browserA.isMultiRemote).toBe(undefined)
 
                     expect(multiRemoteBrowser.strategies).toBeInstanceOf(Map)
                     expect(multiRemoteBrowser.isW3C).toBe(true)
@@ -351,7 +351,7 @@ describe('multi remote test', () => {
                     expect(multiRemoteBrowser.puppeteer).toBeDefined()
                     expect(multiRemoteBrowser.isNativeContext).toBe(false)
                     expect(multiRemoteBrowser.mobileContext).toBe(undefined)
-                    expect(multiRemoteBrowser.isMultiremote).toBe(true)
+                    expect(multiRemoteBrowser.isMultiRemote).toBe(true)
 
                     expect(selected.strategies).toEqual(multiRemoteBrowser.strategies)
                     expect(selected.isW3C).toBe(multiRemoteBrowser.isW3C)
@@ -368,7 +368,7 @@ describe('multi remote test', () => {
                     expect(selected.puppeteer).toBe(multiRemoteBrowser.puppeteer)
                     expect(selected.isNativeContext).toBe(multiRemoteBrowser.isNativeContext)
                     expect(selected.mobileContext).toBe(multiRemoteBrowser.mobileContext)
-                    expect(selected.isMultiremote).toBe(multiRemoteBrowser.isMultiremote)
+                    expect(selected.isMultiRemote).toBe(multiRemoteBrowser.isMultiRemote)
                 })
             })
         })
@@ -399,7 +399,7 @@ describe('multi remote test', () => {
             expect(elements.foundWith).toBe('$$')
             expect(elements.parent).toBeDefined()
             expect(elements.getElements).toBeDefined()
-            expect(elements.isMultiremote).toBe(true)
+            expect(elements.isMultiRemote).toBe(true)
             expect(Array.isArray(elements)).toBe(true)
         })
 

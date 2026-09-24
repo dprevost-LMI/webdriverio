@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import ProtocolStub from '../src/protocol-stub.js'
-import Multiremote from '../src/multiremote.js'
+import MultiRemote from '../src/multiremote.js'
 
 describe('reloadSession', () => {
     it('should throw', () => {
@@ -103,7 +103,7 @@ describe('attachToSession', () => {
     })
 
     it('should call modifier if multiremote', async () => {
-        const multiremote = new Multiremote()
+        const multiremote = new MultiRemote()
         // @ts-ignore test scenario
         multiremote.instances.instanceName = 'instance'
 
