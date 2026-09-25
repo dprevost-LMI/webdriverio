@@ -191,16 +191,19 @@ Appium 3 [removed many deprecated base-driver endpoints](https://appium.io/docs/
 
 Appium 3 requires a driver or `*` scope prefix on `--allow-insecure` features, for example `uiautomator2:adb_shell` or `*:adb_shell`.
 
-## MultiRemote naming
+## Multi-remote naming
 
-APIs spelled `Multiremote` are now `MultiRemote`. The old names are not aliased.
+APIs spelled `multiremote` or `Multiremote` are now camelCased as `multiRemote` / `MultiRemote`. The old names are not aliased.
 
 | v9 | v10 |
 |----|-----|
+| `multiremote()` (`webdriverio`) | `multiRemote()` |
 | `WebdriverIO.MultiremoteConfig` | `WebdriverIO.MultiRemoteConfig` |
-| `browser.isMultiremote` | `browser.isMultiRemote` |
+| `isMultiremote` on the browser, `$` and `$$` results | `isMultiRemote` |
 | `Capabilities.RequestedMultiremoteCapabilities` | `Capabilities.RequestedMultiRemoteCapabilities` |
 | `Capabilities.WithRequestedMultiremoteCapabilities` | `Capabilities.WithRequestedMultiRemoteCapabilities` |
 | `runner.isMultiremote` (reporters) | `runner.isMultiRemote` |
+| `Launcher#isMultiremote`, `Launcher#isParallelMultiremote` (`@wdio/cli`) | `isMultiRemote`, `isParallelMultiRemote` |
+| `browser.multiremoteFetch()` (`@wdio/webdriver-mock-service`) | `browser.multiRemoteFetch()` |
 
-The old `isMultiremote` reads as `undefined`, not an error. Search for `Multiremote` (case-sensitive) and replace every match. Allure reports also label MultiRemote tests with `isMultiRemote` instead of `isMultiremote`.
+The old `isMultiremote` reads as `undefined`, not an error. Search for `multiremote` and `Multiremote` (case-sensitive) and replace every match; the deprecated `multiremotebrowser` global is unchanged. Allure reports also label multi-remote tests with `isMultiRemote` instead of `isMultiremote`.

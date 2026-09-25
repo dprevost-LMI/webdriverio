@@ -88,7 +88,7 @@ describe('recording custom commands', () => {
 })
 
 describe('attachToSession', () => {
-    it('should throw if not multiremote', async () => {
+    it('should throw if not multi-remote', async () => {
         const modifier = vi.fn()
         expect(() => ProtocolStub.attachToSession({
             sessionId: '1234',
@@ -102,15 +102,15 @@ describe('attachToSession', () => {
             .toThrow()
     })
 
-    it('should call modifier if multiremote', async () => {
-        const multiremote = new MultiRemote()
+    it('should call modifier if multi-remote', async () => {
+        const multiRemote = new MultiRemote()
         // @ts-ignore test scenario
-        multiremote.instances.instanceName = 'instance'
+        multiRemote.instances.instanceName = 'instance'
 
         const session = await ProtocolStub.attachToSession(
             // @ts-expect-error
             undefined,
-            multiremote.modifier.bind(multiremote)
+            multiRemote.modifier.bind(multiRemote)
         )
 
         expect(session.capabilities).toBeUndefined()

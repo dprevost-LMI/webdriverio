@@ -244,7 +244,7 @@ export default function WebDriver(options: object, modifier?: Function, properti
                 }
 
                 /**
-                 * add command to every multiremote instance
+                 * add command to every multi-remote instance
                  */
                 if (_instances) {
                     Object.values(_instances).forEach((instance: { __propertiesObject__: Record<string, unknown> }) => {
@@ -290,7 +290,7 @@ export default function WebDriver(options: object, modifier?: Function, properti
          *                                      takes original function as first argument.
          * @param  {boolean=} attachToElement   overwrite browser command (false) or element command (true)
          * @param  {Object=}  proto             prototype to add function to (optional)
-         * @param  {Object=}  instances         multiremote instances
+         * @param  {Object=}  instances         multi-remote instances
          */
         client.overwriteCommand = function (name: string, func: Function, attachToElement = false, proto: Record<string, unknown>, instances?: WebdriverIO.Browser | WebdriverIO.MultiRemoteBrowser) {
             const customCommand = typeof commandWrapper === 'function'
@@ -299,7 +299,7 @@ export default function WebDriver(options: object, modifier?: Function, properti
             if (attachToElement) {
                 if (instances) {
                     /**
-                     * add command to every multiremote instance
+                     * add command to every multi-remote instance
                      */
                     Object.values(instances).forEach(instance => {
                         setElementOverride(instance.__propertiesObject__.__elementOverrides__.value, name, customCommand)

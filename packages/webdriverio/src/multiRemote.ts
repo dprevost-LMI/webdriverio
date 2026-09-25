@@ -4,7 +4,7 @@ import { webdriverMonad, wrapCommand } from '@wdio/utils'
 import type { Options } from '@wdio/types'
 import type { ProtocolCommands } from '@wdio/protocols'
 
-import { multiremoteHandler } from './middlewares.js'
+import { multiRemoteHandler } from './middlewares.js'
 import { addLocatorStrategyHandler, enhanceElementsArray, getPrototype } from './utils/index.js'
 import type { BrowserCommandsType, Selector, WebdriverIOEventMap } from './types.js'
 
@@ -135,7 +135,7 @@ export default class MultiRemote {
      * elem.getHTML()
      * ```
      *
-     * or in case multiremote is used
+     * or in case multi-remote is used
      *
      * ```
      * const elems = $$('div')
@@ -196,11 +196,11 @@ export default class MultiRemote {
         // @ts-expect-error
         const sessionId = this.sessionId
 
-        return element(sessionId, multiremoteHandler(scope.commandWrapper.bind(scope)))
+        return element(sessionId, multiRemoteHandler(scope.commandWrapper.bind(scope)))
     }
 
     /**
-     * handle commands for multiremote instances
+     * handle commands for multi-remote instances
      */
     commandWrapper (commandName: keyof (ProtocolCommands & BrowserCommandsType) & 'getInstance') {
         const instances = this.instances
@@ -210,7 +210,7 @@ export default class MultiRemote {
         if (commandName === 'getInstance') {
             return function commandWrapperGetInstance(this: Record<string, WebdriverIO.Browser | WebdriverIO.Element>, browserName: string) {
                 if (!this[browserName]) {
-                    throw new Error(`MultiRemote object has no instance named "${browserName}"`)
+                    throw new Error(`Multi-remote object has no instance named "${browserName}"`)
                 }
                 return this[browserName]
             }
