@@ -1,5 +1,5 @@
 import { Component, Prop } from '@stencil/core'
-import { MatchResults } from '@stencil-community/router'
+import type { MatchResults } from '@stencil-community/router'
 
 @Component({
     tag: 'app-profile',

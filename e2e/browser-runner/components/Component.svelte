@@ -1,13 +1,13 @@
 <script>
-    export let name
+export let name
 
-    let buttonText = 'Button'
+let buttonText = 'Button'
 
-    function handleClick() {
-      buttonText = 'Button Clicked'
-    }
-  </script>
+function handleClick() {
+    buttonText = 'Button Clicked'
+}
+</script>
 
-  <h1>Hello {name}!</h1>
+<h1>Hello {name}!</h1>
 
-  <button on:click="{handleClick}">{buttonText}</button>
+<button on:click="{handleClick}">{buttonText}</button>

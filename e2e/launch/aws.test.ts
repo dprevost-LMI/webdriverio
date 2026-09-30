@@ -13,8 +13,8 @@ if (!projectArn) {
     throw new Error('Please provide AWS_DEVICE_FARM_ARN in your environment')
 }
 
-test('allow to attach to an existing session', async () => {
-    return
+// Disabled since #13906 (session manager consolidation). `test.skip` reports it as skipped, not passed.
+test.skip('allow to attach to an existing session', async () => {
     const devicefarm = new AWS.DeviceFarm({ region: 'us-west-2' })
     const testGridUrlResult = await devicefarm.createTestGridUrl({
         projectArn,
